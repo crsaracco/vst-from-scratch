@@ -4,6 +4,7 @@ extern crate simplelog;
 use std::fs::File;
 use simplelog::*;
 
+#[macro_use] mod macros;
 mod vst;
 mod function;
 mod plugin;
