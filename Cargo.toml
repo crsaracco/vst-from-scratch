@@ -1,0 +1,9 @@
+[package]
+name = "vst-from-scratch"
+version = "0.1.0"
+authors = ["Charles Saracco <crsaracco@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "vst_from_scratch"
+crate-type = ["cdylib"]
