@@ -25,7 +25,7 @@ pub type PluginDispatch = fn(
 ) -> isize;
 
 pub fn plugin_dispatch(_effect: *mut crate::AEffect, _opcode: i32, _index: i32, _value: isize, _ptr: *mut c_void, _opt: f32) -> isize {
-    // Nothing.
+    debug!("plugin_dispatch");
     return 0;
 }
 
@@ -39,7 +39,7 @@ pub type SetParameter = fn(
 );
 
 pub fn set_parameter(_effect: *mut crate::AEffect, _index: i32, _value: f32) {
-    // Nothing.
+    debug!("set_parameter");
 }
 
 
@@ -51,7 +51,7 @@ pub type GetParameter = fn(
 ) -> f32;
 
 pub fn get_parameter(_effect: *mut crate::AEffect, _index: i32) -> f32 {
-    // Nothing.
+    debug!("get_parameter");
     return 0.0;
 }
 
@@ -67,10 +67,11 @@ pub type Process = fn(
 );
 
 pub fn process(_effect: *mut crate::AEffect, _raw_inputs: *const *const f32, _raw_outputs: *mut *mut f32, _samples: i32) {
-    // Nothing.
+    debug!("process");
 }
 
 pub fn process_deprecated(_effect: *mut crate::AEffect, _raw_inputs: *const *const f32, _raw_outputs: *mut *mut f32, _samples: i32) {
+    debug!("process_deprecated");
     // This function used to take samples, calculate something based on those samples, and
     // *add* the result to the original sample (for some reason...?)
     // It is now DEPRECATED, so it shouldn't ever be called.
@@ -89,5 +90,5 @@ pub type ProcessF64 = fn(
 );
 
 pub fn process_f64(_effect: *mut crate::AEffect, _raw_inputs: *const *const f64, _raw_outputs: *mut *mut f64, _samples: i32) {
-    // Nothing.
+    debug!("process_f64");
 }

@@ -1,4 +1,11 @@
-use std::os::raw::c_void;
+#[macro_use] extern crate log;
+extern crate simplelog;
+
+use std::{
+    os::raw::c_void,
+    fs::File,
+};
+use simplelog::*;
 
 mod function;
 
@@ -32,6 +39,16 @@ pub struct AEffect {
 
 #[no_mangle]
 pub extern "C" fn VSTPluginMain(_callback: function::HostDispatch) -> *mut AEffect {
+    let mut logger_config = Config::default();
+    logger_config.time_format = Some("%H:%M:%S%.6f");
+    CombinedLogger::init(
+        vec![
+            WriteLogger::new(LevelFilter::max(), logger_config, File::create("/tmp/plugin2.log").unwrap()),
+        ]
+    ).unwrap();
+
+    debug!("Loaded plugin");
+
     // TODO: save the HostCallbackProc for later so that the plugin can call it.
     // Need an actual Plugin struct for this though.
 
