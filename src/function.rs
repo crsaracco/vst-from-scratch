@@ -1,6 +1,5 @@
 use std::os::raw::c_void;
 
-
 /// Host dispatch function:
 /// Called by the plugin to request something from the host.
 pub type HostDispatch = fn(
@@ -24,9 +23,9 @@ pub type PluginDispatch = fn(
     opt: f32,
 ) -> isize;
 
-pub fn plugin_dispatch(_effect: *mut crate::AEffect, _opcode: i32, _index: i32, _value: isize, _ptr: *mut c_void, _opt: f32) -> isize {
-    debug!("plugin_dispatch");
-    return 0;
+pub fn plugin_dispatch(effect: *mut crate::AEffect, _opcode: i32, _index: i32, _value: isize, _ptr: *mut c_void, _opt: f32) -> isize {
+    let plugin = unsafe { (*effect).get_plugin() };
+    plugin.dispatch()
 }
 
 
@@ -38,8 +37,9 @@ pub type SetParameter = fn(
     value: f32,
 );
 
-pub fn set_parameter(_effect: *mut crate::AEffect, _index: i32, _value: f32) {
-    debug!("set_parameter");
+pub fn set_parameter(effect: *mut crate::AEffect, _index: i32, _value: f32) {
+    let plugin = unsafe { (*effect).get_plugin() };
+    plugin.set_parameter()
 }
 
 
@@ -50,9 +50,9 @@ pub type GetParameter = fn(
     index: i32,
 ) -> f32;
 
-pub fn get_parameter(_effect: *mut crate::AEffect, _index: i32) -> f32 {
-    debug!("get_parameter");
-    return 0.0;
+pub fn get_parameter(effect: *mut crate::AEffect, _index: i32) -> f32 {
+    let plugin = unsafe { (*effect).get_plugin() };
+    plugin.get_parameter()
 }
 
 
@@ -66,12 +66,13 @@ pub type Process = fn(
     sample_frames: i32,
 );
 
-pub fn process(_effect: *mut crate::AEffect, _raw_inputs: *const *const f32, _raw_outputs: *mut *mut f32, _samples: i32) {
-    debug!("process");
+pub fn process(effect: *mut crate::AEffect, _raw_inputs: *const *const f32, _raw_outputs: *mut *mut f32, _samples: i32) {
+    let plugin = unsafe { (*effect).get_plugin() };
+    plugin.process()
 }
 
 pub fn process_deprecated(_effect: *mut crate::AEffect, _raw_inputs: *const *const f32, _raw_outputs: *mut *mut f32, _samples: i32) {
-    debug!("process_deprecated");
+    warn!("process_deprecated");
     // This function used to take samples, calculate something based on those samples, and
     // *add* the result to the original sample (for some reason...?)
     // It is now DEPRECATED, so it shouldn't ever be called.
@@ -89,6 +90,7 @@ pub type ProcessF64 = fn(
     sample_frames: i32
 );
 
-pub fn process_f64(_effect: *mut crate::AEffect, _raw_inputs: *const *const f64, _raw_outputs: *mut *mut f64, _samples: i32) {
-    debug!("process_f64");
+pub fn process_f64(effect: *mut crate::AEffect, _raw_inputs: *const *const f64, _raw_outputs: *mut *mut f64, _samples: i32) {
+    let plugin = unsafe { (*effect).get_plugin() };
+    plugin.process_f64()
 }

@@ -8,6 +8,7 @@ use std::{
 use simplelog::*;
 
 mod function;
+mod plugin;
 
 /// Used with the VST API to pass around plugin information.
 #[repr(C)]
@@ -28,13 +29,20 @@ pub struct AEffect {
     pub _real_qualities: i32,                      // DEPRECATED.
     pub _off_qualities: i32,                       // DEPRECATED.
     pub _io_ratio: f32,                            // DEPRECATED.
-    pub object: *mut c_void,                       // Void pointer usable by the API to store object data. (???)
+    pub plugin: *mut c_void,                       // Store a pointer to the plugin. We can use this to call plugin member functions.
     pub user: *mut c_void,                         // User-defined pointer. (???)
     pub unique_id: i32,                            // Unique identifier for the VST. Used during save/load of preset and project.
     pub version: i32,                              // Plugin version.
     pub process: function::Process,                // process samples (f32)
     pub process_f64: function::ProcessF64,         // process samples (f64) -- note: might never actually be called by the host.
     pub future: [u8; 56],                          // Reserved for future use (should be set to 0).
+}
+
+impl AEffect {
+    pub unsafe fn get_plugin(&mut self) -> &mut plugin::Plugin {
+        let plugin = &mut *(self.plugin as *mut plugin::Plugin);
+        plugin
+    }
 }
 
 #[no_mangle]
@@ -47,10 +55,9 @@ pub extern "C" fn VSTPluginMain(_callback: function::HostDispatch) -> *mut AEffe
         ]
     ).unwrap();
 
-    debug!("Loaded plugin");
+    let plugin = plugin::Plugin::new();
 
     // TODO: save the HostCallbackProc for later so that the plugin can call it.
-    // Need an actual Plugin struct for this though.
 
     let effect = AEffect {
         magic: 0x56737450, // shia_labeouf_magic.gif
@@ -69,7 +76,7 @@ pub extern "C" fn VSTPluginMain(_callback: function::HostDispatch) -> *mut AEffe
         _real_qualities: 0,
         _off_qualities: 0,
         _io_ratio: 0.0,
-        object: Box::into_raw(Box::new(())) as *mut c_void, // i_have_do_idea_what_im_doing.jpg
+        plugin: Box::into_raw(Box::new(plugin)) as *mut c_void, // i_have_do_idea_what_im_doing.jpg
         user: Box::into_raw(Box::new(())) as *mut c_void,
         unique_id: 13371337, // Some random VST ID
         version: 1, // Version 0.0.0.1
