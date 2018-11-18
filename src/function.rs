@@ -25,9 +25,9 @@ pub type PluginDispatch = fn(
     opt: f32,
 ) -> isize;
 
-pub fn plugin_dispatch(vst: *mut Vst, _opcode: i32, _index: i32, _value: isize, _ptr: *mut c_void, _opt: f32) -> isize {
+pub fn plugin_dispatch(vst: *mut Vst, opcode: i32, index: i32, value: isize, ptr: *mut c_void, opt: f32) -> isize {
     let plugin = unsafe { (*vst).get_plugin() };
-    plugin.dispatch()
+    plugin.dispatch(opcode, index, value, ptr, opt)
 }
 
 
